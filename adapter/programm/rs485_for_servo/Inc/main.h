@@ -100,7 +100,7 @@ uint8_t flash_ready(void);
 #define PAUSE_CAL 100
 #define STEP 10
 #define HYSTERESIS 10
-
+#define STEPS_TO_ERROR 10
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus
