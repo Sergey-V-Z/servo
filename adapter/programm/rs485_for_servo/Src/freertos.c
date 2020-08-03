@@ -251,7 +251,7 @@ void StartMainTask(void const * argument)
       }
     }
     
-    // изменить позицию на противоположную 
+    // изменить позицию 
     if (tstart)
     {
       osTimerStart(ServoTimerHandle,5);
@@ -271,6 +271,29 @@ void StartMainTask(void const * argument)
     {
       startCal = 0;
       calibration(&startAngle_Cal, &finishAngle_Cal);
+			
+			//проводим перерасчет	и сохраняем настройки
+			//проверка параметров
+      if ((finishAngle_Cal != 0 & finishAngle_Cal!= 0xffffffff) && (startAngle_Cal != 0 & startAngle_Cal!= 0xffffffff) && 
+        (pointsROtate != 0 & pointsROtate!= 0xffffffff) )
+      {
+        halfPoints = pointsROtate /2; // половина диапазона нужно для смещения
+        totalAngle = (finishAngle_Cal - startAngle_Cal)/10; // максимальное значение
+
+        for(int i = 0;i < pointsROtate+1;i++)
+        {
+          angle[i] = (uint16_t)((totalAngle/(1+exp(-K*((halfPoints * -1)+i))))*10)+startAngle_Cal; // расчет точки
+        }
+				
+				//Сохранить настройки во флеш
+				saveSettings = 0;
+				saveFlash();
+				NVIC_SystemReset();
+
+      }
+			else{
+				// Индикация ошибки параметров для расчета кривой
+			}
     }
     
     // установить параметры пр умолчанию
@@ -308,6 +331,30 @@ void StartMainTask(void const * argument)
       readSettings = 0;
       readFlash();      
     }
+		
+		//функция доводчика
+		
+		switch (pos) // в зависимости от позиции выполняем доводку в нужную чторону
+    { 
+    	case 0:
+				{
+					if(HAL_GPIO_ReadPin(J4_GPIO_Port, J4_Pin) == GPIO_PIN_RESET)
+					{
+						osTimerStart(ServoTimerHandle,5);
+					}
+					break;
+				}
+    	case 1:
+			{
+				if(HAL_GPIO_ReadPin(J5_GPIO_Port, J5_Pin) == GPIO_PIN_RESET)
+				{
+					osTimerStart(ServoTimerHandle,5);
+				}
+    		break;
+			}
+    	default:
+    		break;
+    }
     osDelay(1);
   }
   /* USER CODE END StartMainTask */
@@ -340,36 +387,62 @@ void ModBus_RTU(void const * argument)
 void ServoSet(void const * argument)
 {
   /* USER CODE BEGIN ServoSet */
-  static uint32_t i = 0;
+	//Функция перемешение вала по расчитанной кривой
+	
+  static uint32_t i = 0, curentPosPWM, Closer_Coun;
+	
+	curentPosPWM = posPWM;
+	
+		// проверить изменилась ли позиция
+	do{}while (convertFin != 1);
+	convertFin = 0;
+	pos_U = ((double)ADC_Result[0] * VDD)/4095;
+	posPWM = (uint16_t)map(pos_U, min_U, max_U, max_PosPWM, min_PosPWM);
+
+	// предыдущее положение вала вал, в движении движении
   switch (pos)
   {
-    case 0:
+    case 0: // проход 
     {	
-      if (i == pointsROtate+1)
+      if ((posPWM < (curentPosPWM - HYSTERESIS)) | (posPWM > (curentPosPWM + HYSTERESIS)) | (i == 0) | (HAL_GPIO_ReadPin(J4_GPIO_Port, J4_Pin) == GPIO_PIN_RESET)) // при достижении конца массива отключаем шим и остонавливаем таймер
+      {
+				//если не дошли до концевика то доводим
+				if(HAL_GPIO_ReadPin(J5_GPIO_Port, J5_Pin) == GPIO_PIN_SET)
+				{
+					TIM3->CCR1 = TIM3->CCR1 + 30;
+					Closer_Coun++;
+				}
+				else{
+					TIM3->CCR1 = 0;
+					Closer_Coun = 0;
+					osTimerStop(ServoTimerHandle);				
+				}
+        return;
+      }
+			else 
+			{
+				// устанавливаем следующее положение вала
+				TIM3->CCR1 = angle[i];
+				i--;	
+			}
+
+      break;
+    }
+    case 1:
+    {	
+      if ((posPWM < (curentPosPWM - HYSTERESIS)) | (posPWM > (curentPosPWM + HYSTERESIS)) | (i == pointsROtate+1) | (HAL_GPIO_ReadPin(J5_GPIO_Port, J5_Pin) == GPIO_PIN_RESET) ) // при достижении конца массива отключаем шим и остонавливаем таймер 
       {
         TIM3->CCR1 = 0;
         osTimerStop(ServoTimerHandle);
-        pos = 1;
+        //pos = 1;
         return;
       }
+			// устанавливаем следующее положение вала
       TIM3->CCR1 = angle[i];
       i++; 
     break;
     }
-    case 1:
-    {	
-      if (i == 0)
-      {
-        TIM3->CCR1 = 0;
-        osTimerStop(ServoTimerHandle);
-        pos = 0;
-        return;
-      }
-      TIM3->CCR1 = angle[i];
-      i--;
 
-      break;
-    }
   }
   
   /* USER CODE END ServoSet */
@@ -557,6 +630,7 @@ eMBRegHoldingCB( UCHAR * pucRegBuffer, USHORT usAddress, USHORT usNRegs, eMBRegi
             if((startAngle_Cal !=0) & (finishAngle_Cal !=0) & (startAngle_Cal !=0xffffffff) & (finishAngle_Cal !=0xffffffff))
             {
               tstart = 1;
+							pos = *(pucRegBuffer+1);
             }
             break;
           }
@@ -744,7 +818,7 @@ bool calibration(uint32_t *start, uint32_t *finish)
 			if (HAL_GPIO_ReadPin(J5_GPIO_Port, J5_Pin) == GPIO_PIN_SET)
 			{
 				TIM3->CCR1 = 0;
-				*finish = posPWM;
+				*start = posPWM;
 				curentPosPWM = posPWM;
 				break;
 			}    

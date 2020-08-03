@@ -559,9 +559,10 @@ ARM Macro Assembler    Page 9
 Command Line: --debug --xref --diag_suppress=9931 --cpu=Cortex-M3 --apcs=interw
 ork --depend=rs485_for_servo\startup_stm32f103xe.d -ors485_for_servo\startup_st
 m32f103xe.o -I..\Inc -I.\RTE\_rs485_for_servo -IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5
-.0.1\CMSIS\Include -IC:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.3.0\Device\Includ
-e --predefine="__UVISION_VERSION SETA 524" --predefine="_RTE_ SETA 1" --predefi
-ne="STM32F10X_HD SETA 1" --list=startup_stm32f103xe.lst startup_stm32f103xe.s
+.7.0\CMSIS\Core\Include -IC:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.3.0\Device\I
+nclude --predefine="__UVISION_VERSION SETA 524" --predefine="_RTE_ SETA 1" --pr
+edefine="STM32F10X_HD SETA 1" --list=startup_stm32f103xe.lst startup_stm32f103x
+e.s
 
 
 
