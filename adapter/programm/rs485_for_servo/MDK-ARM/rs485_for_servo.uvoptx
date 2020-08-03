@@ -101,7 +101,7 @@
         <sRunDeb>0</sRunDeb>
         <sLrtime>0</sLrtime>
         <bEvRecOn>1</bEvRecOn>
-        <nTsel>5</nTsel>
+        <nTsel>11</nTsel>
         <sDll></sDll>
         <sDllPa></sDllPa>
         <sDlgDll></sDlgDll>
@@ -143,10 +143,27 @@
         <SetRegEntry>
           <Number>0</Number>
           <Key>ST-LINKIII-KEIL_SWO</Key>
-          <Name>-U56FF72065170535142510187 -O2254 -SF4000 -C0 -A0 -I0 -HNlocalhost -HP7184 -P2 -N00("ARM CoreSight SW-DP") -D00(1BA01477) -L00(0) -TO18 -TC10000000 -TP21 -TDS8007 -TDT0 -TDC1F -TIEFFFFFFFF -TIP8 -FO7 -FD20000000 -FC800 -FN1 -FF0STM32F10x_512.FLM -FS08000000 -FL040000 -FP0($$Device:STM32F103RC$Flash\STM32F10x_512.FLM)</Name>
+          <Name>-U56FF72065170535142510187 -O2254 -SF4000 -C0 -A0 -I0 -HNlocalhost -HP7184 -P2 -N00("ARM CoreSight SW-DP") -D00(1BA01477) -L00(0) -TO18 -TC10000000 -TP21 -TDS8004 -TDT0 -TDC1F -TIEFFFFFFFF -TIP8 -FO15 -FD20000000 -FC800 -FN1 -FF0STM32F10x_512.FLM -FS08000000 -FL040000 -FP0($$Device:STM32F103RC$Flash\STM32F10x_512.FLM)</Name>
         </SetRegEntry>
       </TargetDriverDllRegistry>
-      <Breakpoint/>
+      <Breakpoint>
+        <Bp>
+          <Number>0</Number>
+          <Type>0</Type>
+          <LineNumber>403</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>134230524</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>../Src/freertos.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\rs485_for_servo\../Src/freertos.c\403</Expression>
+        </Bp>
+      </Breakpoint>
       <WatchWindow1>
         <Ww>
           <count>0</count>
@@ -176,12 +193,12 @@
         <Ww>
           <count>5</count>
           <WinNumber>1</WinNumber>
-          <ItemText>posPWM</ItemText>
+          <ItemText>posPWM,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>6</count>
           <WinNumber>1</WinNumber>
-          <ItemText>curentPosPWM</ItemText>
+          <ItemText>curentPosPWM,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>7</count>
@@ -242,6 +259,11 @@
           <count>18</count>
           <WinNumber>1</WinNumber>
           <ItemText>totalAngle,0x0A</ItemText>
+        </Ww>
+        <Ww>
+          <count>19</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>posPWM</ItemText>
         </Ww>
       </WatchWindow1>
       <WatchWindow2>

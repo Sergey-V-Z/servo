@@ -99,8 +99,8 @@ uint8_t flash_ready(void);
 //настройки для калибровки
 #define PAUSE_CAL 100
 #define STEP 10
-#define HYSTERESIS 10
-#define STEPS_TO_ERROR 10
+#define HYSTERESIS 20
+#define STEPS_TO_ERROR 100
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus
