@@ -150,9 +150,9 @@
         <Bp>
           <Number>0</Number>
           <Type>0</Type>
-          <LineNumber>403</LineNumber>
+          <LineNumber>548</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134230524</Address>
+          <Address>134230862</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -161,7 +161,7 @@
           <BreakIfRCount>1</BreakIfRCount>
           <Filename>../Src/freertos.c</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\rs485_for_servo\../Src/freertos.c\403</Expression>
+          <Expression>\\rs485_for_servo\../Src/freertos.c\548</Expression>
         </Bp>
       </Breakpoint>
       <WatchWindow1>
@@ -265,6 +265,36 @@
           <WinNumber>1</WinNumber>
           <ItemText>posPWM</ItemText>
         </Ww>
+        <Ww>
+          <count>20</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>i,0x0A</ItemText>
+        </Ww>
+        <Ww>
+          <count>21</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>pointsROtate,0x0A</ItemText>
+        </Ww>
+        <Ww>
+          <count>22</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>angle[i],0x0A</ItemText>
+        </Ww>
+        <Ww>
+          <count>23</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>b,0x0A</ItemText>
+        </Ww>
+        <Ww>
+          <count>24</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>a</ItemText>
+        </Ww>
+        <Ww>
+          <count>25</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>angle[a],0x0A</ItemText>
+        </Ww>
       </WatchWindow1>
       <WatchWindow2>
         <Ww>
@@ -281,6 +311,11 @@
           <count>2</count>
           <WinNumber>2</WinNumber>
           <ItemText>pos_U</ItemText>
+        </Ww>
+        <Ww>
+          <count>3</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>angle[i]</ItemText>
         </Ww>
       </WatchWindow2>
       <MemoryWindow1>

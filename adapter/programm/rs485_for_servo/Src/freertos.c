@@ -389,7 +389,7 @@ void ServoSet(void const * argument)
   /* USER CODE BEGIN ServoSet */
 	//Функция перемешение вала по расчитанной кривой
 	
-  static uint32_t i = 0, curentPosPWM, Closer_Coun;
+  static uint32_t i = 0, curentPosPWM, flag_I_comp = 0, flag_array_end = 0;
 	
 	curentPosPWM = posPWM;
 	
@@ -400,89 +400,228 @@ void ServoSet(void const * argument)
 	posPWM = (uint16_t)map(pos_U, min_U, max_U, max_PosPWM, min_PosPWM);
 
 	// предыдущее положение вала вал, в движении движении
-  switch (pos)
-  {
-    case 0: // проход 
-    {	
-			
-      if ((posPWM < (curentPosPWM - HYSTERESIS)) | (posPWM > (curentPosPWM + HYSTERESIS)) | (HAL_GPIO_ReadPin(J5_GPIO_Port, J5_Pin) == GPIO_PIN_SET)) // при достижении конца массива отключаем шим и остонавливаем таймер
-      {
-				//если не дошли до концевика то доводим
-				if((HAL_GPIO_ReadPin(J5_GPIO_Port, J5_Pin) == GPIO_PIN_RESET) & (Closer_Coun <= STEPS_TO_ERROR))
-				{
-					uint32_t pwmtemp = TIM3->CCR1 - 1;
-					TIM3->CCR1 = pwmtemp; //двигаем по немногу вал
-					Closer_Coun++; // добовляем счетчик 
-				}
-				else{
-					if((HAL_GPIO_ReadPin(J5_GPIO_Port, J5_Pin) == GPIO_PIN_RESET) & (Closer_Coun >= STEPS_TO_ERROR)) // если не дошло до концевика и предохранительные шаги закончились то выдаем ошибку
-					{
-						HAL_GPIO_WritePin(LED_G_GPIO_Port, LED_G_Pin, GPIO_PIN_SET); //гасим зеленый
-						HAL_GPIO_WritePin(LED_R_GPIO_Port, LED_R_Pin, GPIO_PIN_RESET); // зажигаем красный
-					}
-					//TIM3->CCR1 = 0;
-					Closer_Coun = 0;
-					osTimerStop(ServoTimerHandle);
-					return;
-				}
-        
-      }
-			else 
+//  switch (pos)
+//  {
+//    case 0: // проход 
+//    {	
+//			
+//      if ((posPWM < (curentPosPWM - HYSTERESIS)) | (posPWM > (curentPosPWM + HYSTERESIS)) | (HAL_GPIO_ReadPin(J5_GPIO_Port, J5_Pin) == GPIO_PIN_SET)) // при достижении конца массива отключаем шим и остонавливаем таймер
+//      {
+//				//если не дошли до концевика то доводим
+//				if((HAL_GPIO_ReadPin(J5_GPIO_Port, J5_Pin) == GPIO_PIN_RESET) & (Closer_Coun <= STEPS_TO_ERROR))
+//				{
+//					uint32_t pwmtemp = TIM3->CCR1 - 1;
+//					TIM3->CCR1 = pwmtemp; //двигаем по немногу вал
+//					Closer_Coun++; // добовляем счетчик 
+//				}
+//				else{
+//					if((HAL_GPIO_ReadPin(J5_GPIO_Port, J5_Pin) == GPIO_PIN_RESET) & (Closer_Coun >= STEPS_TO_ERROR)) // если не дошло до концевика и предохранительные шаги закончились то выдаем ошибку
+//					{
+//						HAL_GPIO_WritePin(LED_G_GPIO_Port, LED_G_Pin, GPIO_PIN_SET); //гасим зеленый
+//						HAL_GPIO_WritePin(LED_R_GPIO_Port, LED_R_Pin, GPIO_PIN_RESET); // зажигаем красный
+//					}
+//					//TIM3->CCR1 = 0;
+//					Closer_Coun = 0;
+//					osTimerStop(ServoTimerHandle);
+//					return;
+//				}
+//        
+//      }
+//			else 
+//			{
+//				// устанавливаем следующее положение вала
+//				TIM3->CCR1 = angle[i];
+//				if(i == 0)
+//				{
+//					Closer_Coun = 0;
+//					osTimerStop(ServoTimerHandle);
+//				}
+//				else{i--;}
+//					
+//			}
+
+//      break;
+//    }
+//    case 1:
+//    {	
+//			
+//      if ((posPWM < (curentPosPWM - HYSTERESIS)) | (posPWM > (curentPosPWM + HYSTERESIS)) | (HAL_GPIO_ReadPin(J4_GPIO_Port, J4_Pin) == GPIO_PIN_SET) ) // при достижении конца массива отключаем шим и остонавливаем таймер 
+//      {
+//				//если не дошли до концевика то доводим
+//				if((HAL_GPIO_ReadPin(J4_GPIO_Port, J4_Pin) == GPIO_PIN_RESET) & (Closer_Coun <= STEPS_TO_ERROR))
+//				{
+//					uint32_t pwmtemp = TIM3->CCR1 + 1;
+//					TIM3->CCR1 =  //двигаем по немногу вал
+//					Closer_Coun++; // добовляем счетчик 
+//				}
+//				else{
+//					if((HAL_GPIO_ReadPin(J4_GPIO_Port, J4_Pin) == GPIO_PIN_RESET) & (Closer_Coun >= STEPS_TO_ERROR)) // если не дошло до концевика и предохранительные шаги закончились то выдаем ошибку
+//					{
+//						HAL_GPIO_WritePin(LED_G_GPIO_Port, LED_G_Pin, GPIO_PIN_SET); //гасим зеленый
+//						HAL_GPIO_WritePin(LED_R_GPIO_Port, LED_R_Pin, GPIO_PIN_RESET); // зажигаем красный
+//					}
+//					//TIM3->CCR1 = 0;
+//					Closer_Coun = 0;
+//					osTimerStop(ServoTimerHandle);
+//					return;
+//				}
+//      }
+//			else{
+//				// устанавливаем следующее положение вала
+//				TIM3->CCR1 = angle[i];
+//				if(i == pointsROtate+1)
+//				{
+//					Closer_Coun = 0;
+//					osTimerStop(ServoTimerHandle);
+//				}
+//				else{i++;}
+//				 
+
+//			}
+//    break;
+//    }
+
+//  }
+	if(flag_I_comp != 1) // если флаг не установлен, значит вычисляем I
+	{
+		for(int a=0; a<=pointsROtate; a++)
+		{
+			if(posPWM <= angle[0])
 			{
-				// устанавливаем следующее положение вала
-				TIM3->CCR1 = angle[i];
-				if(i == 0)
+				flag_I_comp = 1;
+				i = 0;
+				break;
+			}
+			if(posPWM >= angle[pointsROtate])
+			{
+				flag_I_comp = 1;
+				i = pointsROtate;
+				break;
+			}
+			
+			if(posPWM >= angle[a])
+			{
+				flag_I_comp = 1;
+				i = a;
+				break;
+			}
+		}
+	}
+	
+	// проход по массиву
+	if (flag_array_end != 1)
+	{
+		switch (pos)
+    {
+    	case 0:
+    	{
+				if ((posPWM < (curentPosPWM - HYSTERESIS)) | (posPWM > (curentPosPWM + HYSTERESIS)) | (HAL_GPIO_ReadPin(J5_GPIO_Port, J5_Pin) == GPIO_PIN_SET)) // завершили движение
 				{
-					Closer_Coun = 0;
+					flag_I_comp = 0;
+					flag_array_end = 0;
 					osTimerStop(ServoTimerHandle);
 				}
-				else{i--;}
-					
-			}
-
-      break;
-    }
-    case 1:
-    {	
-			
-      if ((posPWM < (curentPosPWM - HYSTERESIS)) | (posPWM > (curentPosPWM + HYSTERESIS)) | (HAL_GPIO_ReadPin(J4_GPIO_Port, J4_Pin) == GPIO_PIN_SET) ) // при достижении конца массива отключаем шим и остонавливаем таймер 
-      {
-				//если не дошли до концевика то доводим
-				if((HAL_GPIO_ReadPin(J4_GPIO_Port, J4_Pin) == GPIO_PIN_RESET) & (Closer_Coun <= STEPS_TO_ERROR))
+				else 
 				{
-					uint32_t pwmtemp = TIM3->CCR1 + 1;
-					TIM3->CCR1 =  //двигаем по немногу вал
-					Closer_Coun++; // добовляем счетчик 
+					// устанавливаем следующее положение вала
+					TIM3->CCR1 = angle[i];
+					if(i == 0)
+					{
+						flag_array_end = 1;
+						//osTimerStop(ServoTimerHandle);
+					}
+					else{i--;}
+						
+				}
+    		break;
+    	}
+    	case 1:
+    	{
+				if ((posPWM < (curentPosPWM - HYSTERESIS)) | (posPWM > (curentPosPWM + HYSTERESIS)) | (HAL_GPIO_ReadPin(J4_GPIO_Port, J4_Pin) == GPIO_PIN_SET) ) // завершили движение
+				{
+					flag_I_comp = 0;
+					flag_array_end = 0;
+					osTimerStop(ServoTimerHandle);
 				}
 				else{
-					if((HAL_GPIO_ReadPin(J4_GPIO_Port, J4_Pin) == GPIO_PIN_RESET) & (Closer_Coun >= STEPS_TO_ERROR)) // если не дошло до концевика и предохранительные шаги закончились то выдаем ошибку
+					// устанавливаем следующее положение вала
+					TIM3->CCR1 = angle[i];
+					if(i == pointsROtate+1)
 					{
-						HAL_GPIO_WritePin(LED_G_GPIO_Port, LED_G_Pin, GPIO_PIN_SET); //гасим зеленый
-						HAL_GPIO_WritePin(LED_R_GPIO_Port, LED_R_Pin, GPIO_PIN_RESET); // зажигаем красный
+						flag_array_end = 1;
+						//osTimerStop(ServoTimerHandle);
+						osTimerStop(ServoTimerHandle);
+						osTimerStart(ServoTimerHandle,10);
 					}
-					//TIM3->CCR1 = 0;
-					Closer_Coun = 0;
-					osTimerStop(ServoTimerHandle);
-					return;
+					else{i++;}
 				}
-      }
-			else{
-				// устанавливаем следующее положение вала
-				TIM3->CCR1 = angle[i];
-				if(i == pointsROtate+1)
-				{
-					Closer_Coun = 0;
-					osTimerStop(ServoTimerHandle);
-				}
-				else{i++;}
-				 
-
-			}
-    break;
+    		break;
+    	}
+    	default:
+    	{
+    		break;
+    	}
     }
+	}
 
+	//довод если не на позиции
+	if (flag_I_comp == 1 & flag_array_end == 1)
+  {
+		switch (pos)
+    {
+    	case 0:
+    	{
+				
+				if(HAL_GPIO_ReadPin(J5_GPIO_Port, J5_Pin) == GPIO_PIN_SET)
+				{
+					flag_I_comp = 0;
+					flag_array_end = 0;
+					osTimerStop(ServoTimerHandle);
+					break;
+				}
+				if((posPWM < (curentPosPWM - HYSTERESIS)) | (posPWM > (curentPosPWM + HYSTERESIS))) // если мы тут значит что то сломалось 
+				{
+					HAL_GPIO_WritePin(LED_G_GPIO_Port, LED_G_Pin, GPIO_PIN_SET); //гасим зеленый
+					HAL_GPIO_WritePin(LED_R_GPIO_Port, LED_R_Pin, GPIO_PIN_RESET); // зажигаем красный
+					flag_I_comp = 0;
+					flag_array_end = 0;
+					osTimerStop(ServoTimerHandle);
+					break;
+				}
+				TIM3->CCR1 =  posPWM +5;//двигаем по немногу вал
+
+    		break;
+    	}
+    	case 1:
+    	{
+				
+				if(HAL_GPIO_ReadPin(J4_GPIO_Port, J4_Pin) == GPIO_PIN_SET)
+				{
+					flag_I_comp = 0;
+					flag_array_end = 0;
+					osTimerStop(ServoTimerHandle);
+					break;
+				}
+				if((posPWM < (curentPosPWM - HYSTERESIS)) | (posPWM > (curentPosPWM + HYSTERESIS))) // если мы тут значит что то сломалось 
+				{
+					HAL_GPIO_WritePin(LED_G_GPIO_Port, LED_G_Pin, GPIO_PIN_SET); //гасим зеленый
+					HAL_GPIO_WritePin(LED_R_GPIO_Port, LED_R_Pin, GPIO_PIN_RESET); // зажигаем красный
+					flag_I_comp = 0;
+					flag_array_end = 0;
+					osTimerStop(ServoTimerHandle);
+					break;
+				}
+				TIM3->CCR1 =  posPWM + 5;//двигаем по немногу вал
+
+    		break;
+    	}
+    	default:
+    	{
+    		break;
+    	}
+    }
   }
-  
+	
   /* USER CODE END ServoSet */
 }
 
@@ -843,7 +982,7 @@ bool calibration(uint32_t *start, uint32_t *finish)
       pos_U = ((double)ADC_Result[0] * VDD)/4095;
       posPWM = (uint16_t)map(pos_U, min_U, max_U, max_PosPWM, min_PosPWM);
 
-    // если posPWM отличается от curentPosPWM не больше чем на 5 то перейти к следуешему шагу иначе сохронить позицию и перейти к следуещей стороне
+			// если posPWM отличается от curentPosPWM не больше чем на 5 то перейти к следуешему шагу иначе сохронить позицию и перейти к следуещей стороне
 //    if ((posPWM < (curentPosPWM - HYSTERESIS)) | (posPWM > (curentPosPWM + HYSTERESIS)) | (posPWM <= min_PosPWM) | (stopCalibration))
 //    {
 //      stopCalibration = 0;
